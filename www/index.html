@@ -1,0 +1,233 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta http-equiv="Content-Security-Policy" content="default-src * data: gap: https://ssl.gstatic.com; style-src * 'unsafe-inline'; script-src * 'unsafe-inline' 'unsafe-eval'">
+  <script src="components/loader.js"></script>
+    <script src="components/jquery.js"></script>
+  <script src="components/app.js"></script>
+  <script src="lib/onsenui/js/onsenui.min.js"></script>
+
+  <link rel="stylesheet" href="components/loader.css">
+  <link rel="stylesheet" href="lib/onsenui/css/onsenui.css">
+  <link rel="stylesheet" href="lib/onsenui/css/onsen-css-components.css">
+  <link rel="stylesheet" href="css/style.css">
+
+  <script>
+
+
+    // Page init event
+    document.addEventListener('init', function(event) {
+      var page = event.target;
+     
+      if (page.matches('#first-page')) {
+
+        page.querySelector('#push-button').onclick = function() {
+          document.querySelector('#navigator').pushPage('page2.html');
+        };
+
+        page.querySelector('#cad').onclick = function() {
+          document.querySelector('#navigator').pushPage('page3.html');
+        };
+
+      } else if (page.matches('#second-page')) {
+
+        page.querySelector('#pop-button').onclick = function() {
+          document.querySelector('#navigator').popPage();
+        };
+
+      }
+      else if (page.matches('#three-page')) {
+
+        page.querySelector('#pop-button').onclick = function() {
+          document.querySelector('#navigator').popPage();
+        };
+
+      }    
+      else if (page.matches('#home')) {
+
+        page.querySelector('#pop-button').onclick = function() {
+          document.querySelector('#navigator').popPage();          
+        };
+
+      }
+    
+            
+    });
+    
+     $(document).on('click','#entrar',function(){
+      var usuario = document.getElementById('email').value;
+      var senha = document.getElementById('senha').value;      
+
+            $.ajax({
+                                    type: "POST",
+                                    url: "http://www.profrodolfo.com/app/login.php", 
+                                    data: {
+                                        acao: 'Login',
+                                        usuario: usuario,
+                                        senha: senha
+                                    },            
+                                    async: false,
+                                    dataType: "json", 
+                                    success: function (json) {
+                
+                                        if(json.result == "true"){                                            
+                                            document.querySelector('#navigator').pushPage('home.html');
+                                              //ons.notification.alert("ID: "+json.dados.id+"<br>Usuário: "+json.dados.nome);
+                                              var n = json.dados.nome;
+                                              $('#user').html(n);
+                                        }else{
+                                          ons.notification.alert("Usuário ou Senha Inválido");
+                                        }
+                                   }													
+					});
+return false;	
+    });
+    
+    
+     $(document).on('click','#novo',function(){
+      var usuario = $('#usuario').val();
+      var dominio = $('#dominio').val();
+      var email = $('#email').val();
+      var senha = $('#senha').val();
+          
+      
+        					$.ajax({
+										type: "POST",
+										url: "http://www.profrodolfo.com/cadastro/cadastrar.php", //url: "http://www.profrodolfo.com/app/cadastro.php", 
+										data: {
+											acao: 'cadastrar',
+											usuario: usuario,
+											email: email,
+											senha: senha,
+											dominio: dominio
+										},            
+										async: false,
+										dataType: "json", 
+										success: function (json) {					                        
+											if(json.result == "true"){
+											//redirecionar o usuario                        
+										   
+                                             // $('#dados').html("Usuário: "+usuario);
+                                            	ons.notification.alert("Cadastro enviado. (veja seu email)");										
+                     
+                                            document.querySelector('#navigator').pushPage('home.html');
+											}else{
+											 ons.notification.alert("Ops..deu Ruin :(");
+											}
+										}
+                                        
+									});	
+							return false;
+						});	
+  
+
+
+  </script>
+</head>
+<body>
+  <ons-navigator id="navigator" page="page1.html"></ons-navigator>
+
+  <ons-template id="page1.html">
+    <ons-page id="first-page">
+      <ons-toolbar>
+        <div class="center">Home</div>
+          <div class="right">
+              <ons-button modifier="material--flat" id="cad">Cadastrar</ons-button>
+          </div>
+      </ons-toolbar>
+
+      <div class="content" style="text-align: center">
+        <p>Esta é a página home.</p>
+        <ons-button id="push-button">Entrar</ons-button>
+      </div>
+    </ons-page>
+  </ons-template>
+
+  <ons-template id="page2.html">
+    <ons-page id="second-page">
+      <ons-toolbar>
+        <div class="left"><ons-back-button>Home</ons-back-button></div>
+        <div class="center">Acesso Restrito</div>
+      </ons-toolbar>
+
+      <div class="content" style="text-align: center">
+        <p>Entre com os dados de acesso</p>
+        <div style="text-align: center; margin-top: 30px;">
+            <p>
+              <ons-input id="email" modifier="underbar" placeholder="E-mail" float></ons-input>
+            </p>
+            <p>
+              <ons-input id="senha" modifier="underbar" type="password" placeholder="Senha" float></ons-input>
+            </p>
+            <p style="margin-top: 30px;">
+              <ons-button id='entrar'>Entrar</ons-button>
+              <ons-button id="pop-button">Voltar</ons-button>
+            </p>
+          </div>
+      </div>
+    </ons-page>
+  </ons-template>
+
+<ons-template id="page3.html">
+    <ons-page id="three-page">
+      <ons-toolbar>
+        <div class="left"><ons-back-button>:</ons-back-button></div>
+        <div class="center">Voltar </div>
+      </ons-toolbar>
+
+      <div class="content" style="text-align: center">
+       <h1>Formulário de Cadastro</h1>
+          <div style="text-align: center; margin-top: 30px;">
+              <p>
+                <ons-input id="dominio" modifier="underbar" placeholder="Domínio" float></ons-input>.profrodolfo.com
+              </p>
+                <p>
+                <ons-input id="email" modifier="underbar" placeholder="E-mail" float></ons-input>
+              </p>
+               <p>
+               <ons-select id="turma" modifier="material" placeholder="Turma">
+                <option value="1MIN">1MIN</option>
+                <option value="2MIN">2MIN</option>
+                <option value="3MIN">3MIN</option>
+                <option value="2INF">2INFl</option>
+                <option value="3INF">3INF</option>
+              </ons-select>
+              </p>
+              <p>
+                <ons-input id="usuario" modifier="underbar" type="text" placeholder="Usuário" float></ons-input>
+              </p>
+              <p>
+                <ons-input id="senha" modifier="underbar" type="password" placeholder="Senha" float></ons-input>
+              </p>
+            
+            <p style="margin-top: 30px;">
+              <ons-button id='novo'>Cadastrar</ons-button>
+              <ons-button id="pop-button">Voltar</ons-button>
+            </p>
+          </div>
+      </div>
+    </ons-page>
+  </ons-template>
+  
+  <ons-template id="home.html">
+    <ons-page id="home">
+      <ons-toolbar>      
+        <div class="center">Home </div>
+      </ons-toolbar>
+
+      <div class="content" style="text-align: center">
+       <h1><span id="user">Dados da conta</span></h1>
+          <div style="text-align: center; margin-top: 30px;">              
+            <p style="margin-top: 30px;">
+              <div id="dados"></div>              
+              <ons-button id="pop-button">Sair</ons-button>
+            </p>
+          </div>
+      </div>
+    </ons-page>
+  </ons-template>
+
+</body>
+</html>

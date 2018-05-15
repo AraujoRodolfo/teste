@@ -1,0 +1,112 @@
+<?php
+require_once('xmlapi.php');
+$whm = new xmlapi('profrodolfo.com', 'usuario', 'senha');
+if(isset($_GET['usuario']) && isset($_GET['senha']) ){
+$ver = $whm->
+}
+if(isset($_GET['contas'])){
+    $verifica = $whm->listaccts();
+    //print_r($verifica->acct);
+    $conta= $conta;
+    echo '<table>
+            <tr>
+                <td>dominio</td>
+                <td>Usuario</td>
+                <td>Email</td>
+            </tr>';
+        foreach ($verifica->acct as $value){ 
+           
+            $conta[backup] = strval($value->backup);
+            $conta[disklimit] = strval($value->disklimit);
+            $conta[diskused] = strval($value->diskused);
+            $conta[domain] = strval($value->domain);
+            $conta[email] = strval($value->email);
+            $conta[inodeslimit] = strval($value->inodeslimit);
+            $conta[inodesused] = strval($value->inodesused);
+            $conta[ip] = strval($value->ip);
+            $conta[is_locked] = strval($value->is_locked);
+            $conta[legacy_backup] = strval($value->legacy_backup);
+            $conta[mailbox_format] = strval($value->mailbox_format);
+            $conta[max_defer_fail_percentage] = strval($value->max_defer_fail_percentage);
+            $conta[max_email_per_hour] = strval($value->max_email_per_hour);
+            $conta[maxaddons] = strval($value->maxaddons);
+            $conta[maxftp] = strval($value->maxftp);
+            $conta[maxlst] = strval($value->maxlst);
+            $conta[maxparked] = strval($value->maxparked);
+            $conta[maxpop] = strval($value->maxpop);
+            $conta[maxsql] = strval($value->maxsql);
+            $conta[maxsub] = strval($value->maxsub);
+            $conta[outgoing_mail_hold] = strval($value->outgoing_mail_hold);
+            $conta[outgoing_mail_suspended] = strval($value->outgoing_mail_suspended);
+            $conta[owner] = strval($value->owner); 
+            $conta[plan] = strval($value->plan);
+            $conta[shell] = strval($value->shell);
+            $conta[startdate] = strval($value->startdate);
+            $conta[suspended] = strval($value->suspended);
+            $conta[suspendreason] = strval($value->suspendreason);
+            $conta[suspendtime] = strval($value->suspendtime);
+            $conta[temporary] = strval($value->temporary);
+            $conta[theme] = strval($value->theme);
+            $conta[uid] = strval($value->uid);
+            $conta[unix_startdate] = strval($value->unix_startdate);
+            $conta[user] = strval($value->user);
+            
+            echo '<tr>
+                    <td>'.$conta['domain']."</td>
+                    <td>".$conta['user']."</td>
+                    <td>".$conta['email']."</td>
+                    </tr>";
+        
+        }
+        echo '</table>';
+        
+
+}
+ 
+if($_POST['acao'] == 'cadastrar'){
+    
+ 
+    $acc['domain'] = strtolower($_POST['dominio']).".profrodolfo.com";
+    $acc['username'] = $_POST['usuario'];
+    $acc['password'] = $_POST['senha'];
+    $acc['contactemail'] = $_POST['email'];
+    $acc['msel'] = "profrodo_aluno"; //$_POST['plano']
+ 
+    $erro = "";
+    $arr = array();
+    $verifica = $whm->createacct($acc);
+	
+		
+    if($verifica->result->status != 0){
+        $arr['result'] = "true";
+        $arr['msg'] = 'Conta para o domínio <strong>'. $acc['domain'] .'</strong> foi criado com sucesso!';
+        //envia email
+        $assunto = "TESTE DE DSI!";
+
+        $corpo = "Data: ". date('d/m/Y') ."\r\n"."$assunto: Criação de Conta!\r\n";
+        $corpo .= "Aluno: ".$acc['username']."\r\n";
+        $corpo .= "Email: ".$acc['contactemail']."\r\n";
+        $corpo .= "Você fez seu cadastro para conta de hospedagem no Profrodolfo.com.\r\n";
+        $corpo .= "Parabéns, você já pode acessar o serviço! Seguem seus dados de acesso:!!\r\n";
+        $corpo .= "\r\nServidor: ".$acc['domain']."profrodolfo.com/cpanel";
+        $corpo .= "\r\nUsuário: ".$acc['username'];
+        $corpo .= "\r\nSenha: ". $acc['password'];
+        $corpo .= "\r\nEm caso de dúvidas, entre em contato com o professor!\r\n";
+        $de = "rodolfo.araujo10@etec.sp.gov.br";
+        $texto = $corpo;
+        
+        if(mail($acc['contactemail'],$assunto,$corpo,"From: $de")){
+        	$arr['msg'] .= '<h1>Parabéns!</h1>';
+        	 $arr['msg'] .= 'Foi enviado para o email:'.$_SESSION['email']. ' os dados de acesso!.<br>';
+        	 $arr['msg'] .= 'Bora programar =) <br>';
+        }else{
+            $arr['msg'] .= 'Erro ao enviar email :/ <br>';
+            
+        }
+    }
+    else{
+         $arr['result'] = "false";
+         $arr['msg'] .= 'Erro ao tentar criar conta. Tente novamente!<h1> A senha deve contar letras, números e caracter especial obrigatóriamente!</h1> Erro: ' . $verifica->result->statusmsg;
+    }
+    echo json_encode($arr);
+}
